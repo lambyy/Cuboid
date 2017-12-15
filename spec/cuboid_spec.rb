@@ -14,7 +14,7 @@ describe Cuboid do
     it "creates a cuboid with the specified dimensions" do
       expect(subject.dimension).to eq [1, 2, 3]
     end
-    
+
     let (:out_of_bounds) { Cuboid.new(-1, -1, -1, 1, 2, 3) }
 
     it "creates a cuboid at [0, 0, 0] if the specified origin is out of bounds" do
@@ -38,8 +38,9 @@ describe Cuboid do
     it "doesn't move the origin out of bounds" do
       expect(subject.move_to!(-1, -2, -3)).to be false
       expect(subject.origin).to eq [0, 0, 0]
+      subject.move_to!(1, 1, 1)
       expect(subject.move_to!(-1, 0, 0)).to be false
-      expect(subject.origin).to eq [0, 0, 0]
+      expect(subject.origin).to eq [1, 1, 1]
     end
   end
 

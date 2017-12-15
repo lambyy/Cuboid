@@ -16,18 +16,14 @@ class Cuboid
   attr_reader :origin, :dimension
 
   def initialize(x, y, z, l, w, h)
-    if x >= 0 && y >= 0 && z >= 0
-      @origin = [x, y, z]
-    else
-      @origin = [0, 0, 0]
-    end
+    @origin = in_bounds?(x, y, z) ? [x, y, z] : [0, 0, 0]
     @dimension = [l, w, h]
   end
 
   #BEGIN public methods that should be your starting point
 
   def move_to!(x, y, z)
-    if x >= 0 && y >= 0 && z >= 0
+    if in_bounds?(x, y, z)
       @origin = [x, y, z]
       true
     else
@@ -75,7 +71,6 @@ class Cuboid
   def within_cube(vertex)
     borders_cube = false
     3.times do |i|
-      # return false unless within_dimension(vertex[i], i)
       case within_dimension(vertex[i], i)
       when false
         return false
@@ -95,5 +90,9 @@ class Cuboid
 
     return "borders" if point == min || point == max
     (min..max).include?(point)
+  end
+
+  def in_bounds?(x, y, z)
+    x >= 0 && y >= 0 && z >= 0
   end
 end
