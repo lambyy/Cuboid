@@ -70,18 +70,6 @@ class Cuboid
     end
   end
 
-  def rotate_x
-    @dimension[1], @dimension[2] = -1 * @dimension[2], @dimension[1]
-  end
-
-  def rotate_y
-    @dimension[0], @dimension[2] = @dimension[2], -1 * @dimension[0]
-  end
-
-  def rotate_z
-    @dimension[0], @dimension[1] = @dimension[1], -1 * @dimension[0]
-  end
-
   def center
     center = []
     3.times do |i|
@@ -112,6 +100,34 @@ class Cuboid
 
     return "borders" if point == min || point == max
     (min..max).include?(point)
+  end
+
+  def rotate_x
+    @dimension[1], @dimension[2] = -1 * @dimension[2], @dimension[1]
+    shift_origin(1, 2)
+  end
+
+  def rotate_y
+    @dimension[0], @dimension[2] = @dimension[2], -1 * @dimension[0]
+    shift_origin(0, 2)
+  end
+
+  def rotate_z
+    @dimension[0], @dimension[1] = @dimension[1], -1 * @dimension[0]
+    shift_origin(0, 1)
+  end
+
+  def shift_origin(dim1, dim2)
+    @origin[dim1] = @origin[dim2] - shift(dim1)
+    @origin[dim2] = @origin[dim2] - shift(dim2)
+  end
+
+  def shift(dim)
+    min = 0
+    vertices.each do |vertex|
+      min = vertex[dim] if min > vertex[dim]
+    end
+    min
   end
 
   def in_bounds?(x, y, z)
