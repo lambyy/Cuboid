@@ -59,6 +59,28 @@ class Cuboid
   end
 
   #END public methods that should be your starting point
+  def rotate(axis)
+    case axis
+    when "x"
+      rotate_x
+    when "y"
+      rotate_y
+    when "z"
+      rotate_z
+    end
+  end
+
+  def rotate_x
+    @dimension[1], @dimension[2] = -1 * @dimension[2], @dimension[1]
+  end
+
+  def rotate_y
+    @dimension[0], @dimension[2] = @dimension[2], -1 * @dimension[0]
+  end
+
+  def rotate_z
+    @dimension[0], @dimension[1] = @dimension[1], -1 * @dimension[0]
+  end
 
   def center
     center = []
