@@ -6,6 +6,23 @@ require 'cuboid'
 describe Cuboid do
   subject { Cuboid.new(0, 0, 0, 1, 2, 3) }
 
+  describe "initialize" do
+    it "creates a cuboid at the specified origin" do
+      expect(subject.origin).to eq [0, 0, 0]
+    end
+
+    it "creates a cuboid with the specified dimensions" do
+      expect(subject.dimension).to eq [1, 2, 3]
+    end
+    
+    let (:out_of_bounds) { Cuboid.new(-1, -1, -1, 1, 2, 3) }
+
+    it "creates a cuboid at [0, 0, 0] if the specified origin is out of bounds" do
+      expect(out_of_bounds.origin).to eq [0, 0, 0]
+      expect(out_of_bounds.dimension).to eq [1, 2, 3]
+    end
+  end
+
   describe "move_to" do
     it "changes the origin in the simple happy case" do
       expect(subject.move_to!(1,2,3)).to be true
@@ -41,13 +58,11 @@ describe Cuboid do
   end
 
   describe "intersects?" do
-    let(:other_cube) { Cuboid.new(0, 1, 1, 1, 1, 1) }
+    subject { Cuboid.new(0, 0, 0, 3, 3, 3) }
+    let(:other_cube) { Cuboid.new(1, 1, 1, 1, 1, 1) }
 
     it "returns true if the cubes overlap" do
       expect(subject.intersects?(other_cube)).to be true
-    end
-
-    it "returns true if the origins are the same" do
       other_cube.move_to!(0, 0, 0)
       expect(subject.intersects?(other_cube)).to be true
     end
@@ -60,6 +75,20 @@ describe Cuboid do
     it "returns false if the cubes lie side by side without overlapping" do
       other_cube.move_to!(0, 0, 3)
       expect(subject.intersects?(other_cube)).to be false
+    end
+
+    it "correctly determines intersection for both cuboids" do
+      other_cube.move_to!(0, 0, 0)
+      expect(subject.intersects?(other_cube)).to be true
+      expect(other_cube.intersects?(subject)).to be true
+
+      other_cube.move_to!(2, 2, 2)
+      expect(subject.intersects?(other_cube)).to be true
+      expect(other_cube.intersects?(subject)).to be true
+
+      other_cube.move_to!(4, 4, 4)
+      expect(subject.intersects?(other_cube)).to be false
+      expect(other_cube.intersects?(subject)).to be false
     end
   end
 

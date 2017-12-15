@@ -16,7 +16,11 @@ class Cuboid
   attr_reader :origin, :dimension
 
   def initialize(x, y, z, l, w, h)
-    @origin = [x, y, z]
+    if x >= 0 && y >= 0 && z >= 0
+      @origin = [x, y, z]
+    else
+      @origin = [0, 0, 0]
+    end
     @dimension = [l, w, h]
   end
 
@@ -47,21 +51,49 @@ class Cuboid
   #returns true if the two cuboids intersect each other.  False otherwise.
   def intersects?(other)
     other.vertices.each do |vertex|
-      return true if within_cube(vertex)
+      case within_cube(vertex)
+      when "borders"
+        return true if other.within_cube(self.center) || within_cube(other.center)
+      when true
+        return true
+      end
     end
+
     false
   end
 
-  def within_cube(vertex)
+  #END public methods that should be your starting point
+
+  def center
+    center = []
     3.times do |i|
-      return false unless within_dimension(vertex[i], i)
+      center << @origin[i] + @dimension[i] / 2.0
     end
+    center
+  end
+
+  def within_cube(vertex)
+    borders_cube = false
+    3.times do |i|
+      # return false unless within_dimension(vertex[i], i)
+      case within_dimension(vertex[i], i)
+      when false
+        return false
+      when "borders"
+        borders_cube = true
+      end
+    end
+    return "borders" if borders_cube
     true
   end
 
-  def within_dimension(point, dim)
-    (@origin[dim]...(@origin[dim] + @dimension[dim])).include?(point)
-  end
+  private
 
-  #END public methods that should be your starting point
+  def within_dimension(point, dim)
+    limits = [@origin[dim], @origin[dim] + @dimension[dim]]
+    min, max = limits.min, limits.max
+
+    return "borders" if point == min || point == max
+    (min..max).include?(point)
+  end
 end
