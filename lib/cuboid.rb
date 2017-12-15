@@ -2,6 +2,7 @@
 class Cuboid
   def self.differential
     [
+      [0, 0, 0],
       [1, 0, 0],
       [0, 1, 0],
       [0, 0, 1],
@@ -16,11 +17,7 @@ class Cuboid
 
   def initialize(x, y, z, l, w, h)
     @origin = [x, y, z]
-    @dimension = {
-      length: l,
-      width: w,
-      height: h
-    }
+    @dimension = [l, w, h]
   end
 
   #BEGIN public methods that should be your starting point
@@ -35,12 +32,12 @@ class Cuboid
   end
 
   def vertices
-    vertices = [@origin]
+    vertices = []
     Cuboid.differential.each do |diff|
       vertex = []
-      vertex << @origin[0] + diff[0] * @dimension[:length]
-      vertex << @origin[1] + diff[1] * @dimension[:width]
-      vertex << @origin[2] + diff[2] * @dimension[:height]
+      3.times do |i|
+        vertex << @origin[i] + diff[i] * @dimension[i]
+      end
       vertices << vertex
     end
 
@@ -56,11 +53,14 @@ class Cuboid
   end
 
   def within_cube(vertex)
-    within_x = (@origin[0]...(@origin[0] + @dimension[:length])).include?(vertex[0])
-    within_y = (@origin[1]...@origin[1] + @dimension[:width]).include?(vertex[1])
-    within_z = (@origin[2]...@origin[2] + @dimension[:height]).include?(vertex[2])
+    3.times do |i|
+      return false unless within_dimension(vertex[i], i)
+    end
+    true
+  end
 
-    within_x && within_y && within_z
+  def within_dimension(point, dim)
+    (@origin[dim]...(@origin[dim] + @dimension[dim])).include?(point)
   end
 
   #END public methods that should be your starting point
