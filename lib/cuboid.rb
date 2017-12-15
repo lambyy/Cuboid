@@ -1,26 +1,10 @@
-
 class Cuboid
-  def self.differential
-    [
-      [0, 0, 0],
-      [1, 0, 0],
-      [0, 1, 0],
-      [0, 0, 1],
-      [1, 1, 0],
-      [1, 0, 1],
-      [0, 1, 1],
-      [1, 1, 1]
-    ]
-  end
-
   attr_reader :origin, :dimension
 
   def initialize(x, y, z, l, w, h)
     @origin = in_bounds?(x, y, z) ? [x, y, z] : [0, 0, 0]
     @dimension = [l, w, h]
   end
-
-  #BEGIN public methods that should be your starting point
 
   def move_to!(x, y, z)
     if in_bounds?(x, y, z)
@@ -33,7 +17,7 @@ class Cuboid
 
   def vertices
     vertices = []
-    Cuboid.differential.each do |diff|
+    Cuboid.vertex_differential.each do |diff|
       vertex = []
       3.times do |i|
         vertex << @origin[i] + diff[i] * @dimension[i]
@@ -48,8 +32,8 @@ class Cuboid
   def intersects?(other)
     other.vertices.each do |vertex|
       case within_cube(vertex)
-      when "borders"
-        return true if other.within_cube(self.center) || within_cube(other.center)
+      when "on cube surface"
+        return true if other.within_cube(center) || within_cube(other.center)
       when true
         return true
       end
@@ -58,15 +42,14 @@ class Cuboid
     false
   end
 
-  #END public methods that should be your starting point
   def rotate(axis)
     case axis
     when "x"
-      rotate_x
+      rotate_by!(1, 2)
     when "y"
-      rotate_y
+      rotate_by!(2, 0)
     when "z"
-      rotate_z
+      rotate_by!(0, 1)
     end
   end
 
@@ -79,16 +62,16 @@ class Cuboid
   end
 
   def within_cube(vertex)
-    borders_cube = false
+    on_surface_plane = false
     3.times do |i|
       case within_dimension(vertex[i], i)
       when false
         return false
-      when "borders"
-        borders_cube = true
+      when "on surface plane"
+        on_surface_plane = true
       end
     end
-    return "borders" if borders_cube
+    return "on cube surface" if on_surface_plane
     true
   end
 
@@ -98,39 +81,38 @@ class Cuboid
     limits = [@origin[dim], @origin[dim] + @dimension[dim]]
     min, max = limits.min, limits.max
 
-    return "borders" if point == min || point == max
+    return "on surface plane" if point == min || point == max
     (min..max).include?(point)
   end
 
-  def rotate_x
-    @dimension[1], @dimension[2] = -1 * @dimension[2], @dimension[1]
-    shift_origin(1, 2)
+  def rotate_by!(dim1, dim2)
+    @dimension[dim1], @dimension[dim2] = @dimension[dim2], -1 * @dimension[dim1]
+    shift_origin(dim1)
+    shift_origin(dim2)
   end
 
-  def rotate_y
-    @dimension[0], @dimension[2] = @dimension[2], -1 * @dimension[0]
-    shift_origin(0, 2)
-  end
-
-  def rotate_z
-    @dimension[0], @dimension[1] = @dimension[1], -1 * @dimension[0]
-    shift_origin(0, 1)
-  end
-
-  def shift_origin(dim1, dim2)
-    @origin[dim1] = @origin[dim2] - shift(dim1)
-    @origin[dim2] = @origin[dim2] - shift(dim2)
-  end
-
-  def shift(dim)
+  def shift_origin(dim)
     min = 0
     vertices.each do |vertex|
       min = vertex[dim] if min > vertex[dim]
     end
-    min
+    @origin[dim] = @origin[dim] - min
   end
 
   def in_bounds?(x, y, z)
     x >= 0 && y >= 0 && z >= 0
+  end
+
+  def self.vertex_differential
+    [
+      [0, 0, 0],
+      [1, 0, 0],
+      [0, 1, 0],
+      [0, 0, 1],
+      [1, 1, 0],
+      [1, 0, 1],
+      [0, 1, 1],
+      [1, 1, 1]
+    ]
   end
 end

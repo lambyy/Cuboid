@@ -99,11 +99,11 @@ describe Cuboid do
       subject { Cuboid.new(3, 3, 3, 1, 2, 3) }
 
       vertices = [[3, 3, 3], [4, 3, 3], [3, 5, 3], [3, 3, 6], [4, 5, 3], [4, 3, 6], [3, 5, 6], [4, 5, 6]]
-      vertices_x = [[3, 3, 3], [4, 3, 3], [3, 0, 3], [3, 3, 5], [4, 0, 3], [4, 3, 5], [3, 0, 5], [4, 0, 5]]
+      vertices_x = [[3, 3, 3], [4, 3, 3], [3, 6, 3], [3, 3, 1], [4, 6, 3], [4, 3, 1], [3, 6, 1], [4, 6, 1]]
       vertices_2x = [[3, 3, 3], [4, 3, 3], [3, 1, 3], [3, 3, 0], [4, 1, 3], [4, 3, 0], [3, 1, 0], [4, 1, 0]]
-      vertices_y = [[3, 3, 3], [6, 3, 3], [3, 5, 3], [3, 3, 2], [6, 5, 3], [6, 3, 2], [3, 5, 2], [6, 5, 2]]
+      vertices_y = [[3, 3, 3], [0, 3, 3], [3, 5, 3], [3, 3, 4], [3, 5, 4], [0, 3, 4], [0, 5, 3], [0, 5, 4]]
       vertices_z = [[3, 3, 3], [5, 3, 3], [3, 2, 3], [3, 3, 6], [5, 2, 3], [5, 3, 6], [3, 2, 6], [5, 2, 6]]
-      vertices_2xy = [[3, 3, 3], [0, 3, 3], [3, 1, 3], [3, 3, 2], [0, 1, 3], [0, 3, 2], [3, 1, 2], [0, 1, 2]]
+      vertices_2xy = [[3, 3, 3], [6, 3, 3], [3, 1, 3], [3, 3, 4], [6, 1, 3], [6, 3, 4], [3, 1, 4], [6, 1, 4]]
 
       it "rotates cuboid around the x axis" do
         expect(subject.vertices).to match_array(vertices)
@@ -132,7 +132,7 @@ describe Cuboid do
         expect(subject.vertices).to match_array(vertices_2xy)
       end
 
-      let(:other_cube) { Cuboid.new(2, 0, 2, 2, 2, 2) }
+      let(:other_cube) { Cuboid.new(3, 3, 1, 2, 2, 2) }
       it "correctly determines intersection of rotated cuboids" do
         expect(subject.intersects?(other_cube)).to be false
         subject.rotate("x")
@@ -142,19 +142,19 @@ describe Cuboid do
 
     describe "when the cuboid rotates out of bounds" do
       subject { Cuboid.new(0, 0, 0, 1, 2, 3) }
-      vertices3 = [[0, 3, 0], [0, 0, 0], [1, 3, 0], [0, 3, 2], [1, 0, 0], [1, 3, 2], [0, 0, 2], [1, 0, 2]]
-      vertices4 = [[0, 3, 1], [2, 3, 1], [0, 0, 1], [0, 3, 0], [2, 0, 1], [2, 3, 0], [0, 0, 0], [2, 0, 0]]
+      vertices3 = [[0, 0, 2], [0, 0, 0], [1, 0, 2], [0, 3, 2], [1, 3, 2], [1, 0, 0], [0, 3, 0], [1, 3, 0]]
+      vertices4 = [[0, 1, 2], [0, 0, 2], [0, 1, 0], [3, 1, 2], [3, 0, 2], [0, 0, 0], [3, 1, 0], [3, 0, 0]]
 
       it "shifts the cuboid origin" do
         subject.rotate("x")
-        expect(subject.origin).to eq [0, 3, 0]
+        expect(subject.origin).to eq [0, 0, 2]
         expect(subject.vertices).to match_array(vertices3)
       end
 
       it "can rotate and shift cuboid multiple times" do
         subject.rotate("x")
-        subject.rotate("y")
-        expect(subject.origin).to eq [0, 3, 1]
+        subject.rotate("z")
+        expect(subject.origin).to eq [0, 1, 2]
         expect(subject.vertices).to match_array(vertices4)
       end
 
